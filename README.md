@@ -50,12 +50,16 @@ RunPod Console > Templates > New Template:
 
 | 変数名 | 値 | Secret |
 |--------|-----|--------|
-| `GITHUB_TOKEN` | GitHub PAT (`repo` スコープ) | Yes |
+| `GITHUB_TOKEN` | GitHub Fine-grained PAT | Yes |
 | `JUPYTER_PASSWORD` | 任意のパスワード | Yes |
 | `GIT_USER_NAME` | GitHub ユーザー名 | No |
 | `GIT_USER_EMAIL` | メールアドレス | No |
 
-`GITHUB_TOKEN` は https://github.com/settings/tokens で生成 (Classic, `repo` スコープ)。
+`GITHUB_TOKEN` は Fine-grained token を推奨:
+Settings > Developer settings > Personal access tokens > Fine-grained tokens > Generate new token
+
+- **Repository access**: Only select repositories → 対象リポジトリを選択
+- **Permissions > Contents**: Read and write
 
 ## 使い方
 
