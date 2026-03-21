@@ -26,6 +26,10 @@ RUN curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install
 # Starship config
 COPY starship.toml /root/.config/starship.toml
 
+# Claude Code
+RUN curl -fsSL https://claude.ai/install.sh | bash
+ENV PATH="/root/.local/bin:${PATH}"
+
 # Shell config: starship + zoxide
 RUN echo 'eval "$(starship init bash)"' >> /root/.bashrc && \
     echo 'eval "$(zoxide init bash)"' >> /root/.bashrc
