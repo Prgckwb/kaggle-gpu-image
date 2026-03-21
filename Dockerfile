@@ -18,11 +18,13 @@ RUN curl -sS https://starship.rs/install.sh | sh -s -- --yes
 
 # zoxide (cd alternative) + dust (du alternative)
 RUN curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash && \
-    wget -qO /tmp/dust.deb https://github.com/bootandy/dust/releases/latest/download/du-dust_1.1.2_amd64.deb && \
+    DUST_VERSION=$(curl -sI https://github.com/bootandy/dust/releases/latest | grep -i location | sed 's/.*tag\/v//' | tr -d '\r\n') && \
+    wget -qO /tmp/dust.deb "https://github.com/bootandy/dust/releases/download/v${DUST_VERSION}/du-dust_${DUST_VERSION}-1_amd64.deb" && \
     dpkg -i /tmp/dust.deb && rm /tmp/dust.deb
 
-# Shell config: enable starship + zoxide
-RUN echo 'eval "$(starship init bash)"' >> /root/.bashrc && \
+# Shell config: PATH + starship + zoxide
+RUN echo 'export PATH="$HOME/.local/bin:$PATH"' >> /root/.bashrc && \
+    echo 'eval "$(starship init bash)"' >> /root/.bashrc && \
     echo 'eval "$(zoxide init bash)"' >> /root/.bashrc
 
 # Startup hook (called by RunPod's /start.sh)
