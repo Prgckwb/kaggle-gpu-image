@@ -1,0 +1,49 @@
+format = """
+[┌](bold green) $username$hostname$directory$git_branch$git_status$python$cmd_duration$time
+[└](bold green) $character"""
+
+[username]
+show_always = true
+format = "[$user]($style) "
+style_user = "bold blue"
+style_root = "bold red"
+
+[hostname]
+ssh_only = false
+format = "[@$hostname]($style) "
+style = "bold blue"
+
+[directory]
+format = "[$path]($style)[$read_only]($read_only_style) "
+style = "bold cyan"
+truncation_length = 4
+truncate_to_repo = false
+
+[git_branch]
+format = "on [$symbol$branch(:$remote_branch)]($style) "
+symbol = " "
+style = "bold purple"
+
+[git_status]
+format = "([$all_status$ahead_behind]($style) )"
+style = "bold red"
+
+[python]
+format = "via [$symbol$version( \\($virtualenv\\))]($style) "
+symbol = " "
+style = "bold yellow"
+
+[cmd_duration]
+min_time = 500
+format = "took [$duration]($style) "
+style = "bold yellow"
+
+[time]
+disabled = false
+format = "[$time]($style) "
+time_format = "%T"
+style = "dimmed white"
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"

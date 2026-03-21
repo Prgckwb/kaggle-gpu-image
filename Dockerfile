@@ -23,6 +23,9 @@ RUN curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install
     wget -qO /tmp/dust.deb "https://github.com/bootandy/dust/releases/download/v${DUST_VERSION}/du-dust_${DUST_VERSION}-1_amd64.deb" && \
     dpkg -i /tmp/dust.deb && rm /tmp/dust.deb
 
+# Starship config
+COPY starship.toml /root/.config/starship.toml
+
 # Shell config: starship + zoxide
 RUN echo 'eval "$(starship init bash)"' >> /root/.bashrc && \
     echo 'eval "$(zoxide init bash)"' >> /root/.bashrc
