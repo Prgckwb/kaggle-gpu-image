@@ -34,6 +34,8 @@ ENV PATH="/root/.local/bin:${PATH}"
 RUN echo 'eval "$(starship init bash)"' >> /root/.bashrc && \
     echo 'eval "$(zoxide init bash)"' >> /root/.bashrc
 
+WORKDIR /workspace
+
 # Startup hook (called by RunPod's /start.sh)
 COPY pre_start.sh /pre_start.sh
 RUN chmod +x /pre_start.sh
