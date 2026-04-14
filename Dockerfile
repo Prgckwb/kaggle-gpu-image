@@ -12,7 +12,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # gh CLI
 RUN mkdir -p -m 755 /etc/apt/keyrings && \
-    wget -nv -O /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+    curl -sSfLo /etc/apt/keyrings/githubcli-archive-keyring.gpg \
       https://cli.github.com/packages/githubcli-archive-keyring.gpg && \
     chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
@@ -28,7 +28,7 @@ RUN curl -sSfL "https://github.com/starship/starship/releases/download/v${STARSH
 # zoxide (cd alternative) + dust (du alternative) + just (command runner)
 RUN curl -sSfL "https://github.com/ajeetdsouza/zoxide/releases/download/v${ZOXIDE_VERSION}/zoxide-${ZOXIDE_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
       | tar xz -C /usr/local/bin/ && \
-    wget -qO /tmp/dust.deb "https://github.com/bootandy/dust/releases/download/v${DUST_VERSION}/du-dust_${DUST_VERSION}-1_amd64.deb" && \
+    curl -sSfLo /tmp/dust.deb "https://github.com/bootandy/dust/releases/download/v${DUST_VERSION}/du-dust_${DUST_VERSION}-1_amd64.deb" && \
     dpkg -i /tmp/dust.deb && rm /tmp/dust.deb && \
     curl -sSfL "https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
       | tar xz -C /usr/local/bin/ just

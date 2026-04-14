@@ -1,0 +1,4 @@
+ignored:
+  - DL3008  # apt-get pin versions: gh managed via apt repository
+  - SC2174  # mkdir -p -m: parent dirs already exist in base image
+  - SC2016  # single quotes intentional: defer eval to shell startup

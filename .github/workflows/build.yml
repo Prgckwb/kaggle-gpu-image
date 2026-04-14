@@ -3,23 +3,38 @@ name: Build and Push Docker Image
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '0 0 * * 1'  # Every Monday 00:00 UTC (09:00 JST)
   workflow_dispatch:
 
 env:
   CUDA_VERSION: "12.8.1"
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+
   build:
+    needs: lint
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-
+    outputs:
+      image: ${{ steps.image.outputs.name }}
     steps:
       - uses: actions/checkout@v6
 
       - name: Set image name
-        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+        id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
 
       - uses: docker/login-action@v4
         with:
@@ -27,11 +42,51 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: ${{ steps.image.outputs.name }}
+          tags: |
+            type=raw,value=latest
+            type=raw,value=cu${{ env.CUDA_VERSION }}
+            type=sha
+
       - uses: docker/build-push-action@v7
         with:
           context: .
+          platforms: linux/amd64
           push: true
-          tags: |
-            ${{ env.IMAGE }}:latest
-            ${{ env.IMAGE }}:cu${{ env.CUDA_VERSION }}
-            ${{ env.IMAGE }}:${{ github.sha }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  scan:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ needs.build.outputs.image }}:latest
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
