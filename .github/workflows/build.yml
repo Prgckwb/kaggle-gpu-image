@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE: ghcr.io/prgckwb/kaggle-gpu-image
+  IMAGE: ghcr.io/${{ github.repository }}
   CUDA_VERSION: "12.8.1"
 
 jobs:

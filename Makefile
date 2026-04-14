@@ -1,4 +1,6 @@
-IMAGE         = ghcr.io/prgckwb/kaggle-gpu-image
+OWNER         = $(shell gh api user -q .login)
+REPO          = $(shell basename $(shell git rev-parse --show-toplevel))
+IMAGE         = ghcr.io/$(OWNER)/$(REPO)
 CUDA_VERSION  = 12.8.1
 VERSION_TAG   = cu$(CUDA_VERSION)
 
@@ -12,6 +14,6 @@ push:
 	docker push $(IMAGE):$(VERSION_TAG)
 
 login:
-	echo $$(gh auth token) | docker login ghcr.io -u prgckwb --password-stdin
+	echo $$(gh auth token) | docker login ghcr.io -u $(OWNER) --password-stdin
 
 all: login build push

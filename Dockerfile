@@ -27,7 +27,7 @@ RUN curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install
     dpkg -i /tmp/dust.deb && rm /tmp/dust.deb
 
 # Starship config
-COPY starship.toml /root/.config/starship.toml
+COPY config/starship.toml /root/.config/starship.toml
 
 # Claude Code
 RUN curl -fsSL https://claude.ai/install.sh | bash
@@ -40,5 +40,5 @@ RUN echo 'eval "$(starship init bash)"' >> /root/.bashrc && \
 WORKDIR /workspace
 
 # Startup hook (called by RunPod's /start.sh)
-COPY pre_start.sh /pre_start.sh
+COPY config/pre_start.sh /pre_start.sh
 RUN chmod +x /pre_start.sh

@@ -43,7 +43,7 @@ RunPod Console > Templates > New Template:
 | 項目 | 値 |
 |------|-----|
 | Template Name | `KaggleGPU-cu12.8.1` |
-| Container Image | `ghcr.io/prgckwb/kaggle-gpu-image:cu12.8.1` |
+| Container Image | `ghcr.io/<username>/kaggle-gpu-image:cu12.8.1` (例: `ghcr.io/prgckwb/kaggle-gpu-image:cu12.8.1`) |
 | Container Disk | 20 GB |
 | Volume Disk | 50-100 GB |
 | Volume Mount Path | `/workspace` |
@@ -72,7 +72,7 @@ Settings > Developer settings > Personal access tokens > Fine-grained tokens > G
 3. リポジトリをクローン:
    ```bash
    cd /workspace
-   gh repo clone prgckwb/my-competition
+   gh repo clone <username>/my-competition  # 例: gh repo clone prgckwb/my-competition
    cd my-competition
    ```
 4. 依存関係をインストールして学習開始:
