@@ -80,3 +80,39 @@ Settings > Developer settings > Personal access tokens > Fine-grained tokens > G
    uv sync
    uv run python train.py
    ```
+
+## PyTorch の CUDA wheel 設定
+
+このイメージは CUDA 12.8.1 を搭載している。`uv add torch` のデフォルトでは PyPI から CUDA 13.0 用の wheel がインストールされ、ドライバーの不一致で GPU が使えない場合がある。
+
+### プロジェクトの `pyproject.toml` で指定する（推奨）
+
+`uv add` / `uv sync` を使う場合、各プロジェクトの `pyproject.toml` に以下を追加する:
+
+```toml
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cpu", marker = "sys_platform != 'linux'" },
+  { index = "pytorch-cu128", marker = "sys_platform == 'linux'" },
+]
+torchvision = [
+  { index = "pytorch-cpu", marker = "sys_platform != 'linux'" },
+  { index = "pytorch-cu128", marker = "sys_platform == 'linux'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+```
+
+これにより Linux (RunPod) では CUDA 12.8 wheel、macOS/Windows ではCPU wheel が自動で選ばれる。
+
+### `uv pip` を使う場合
+
+イメージに `UV_TORCH_BACKEND=cu128` が設定済みなので、`uv pip install torch` で自動的に CUDA 12.8 wheel がインストールされる。

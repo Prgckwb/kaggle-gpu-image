@@ -33,6 +33,9 @@ COPY config/starship.toml /root/.config/starship.toml
 RUN curl -fsSL https://claude.ai/install.sh | bash
 ENV PATH="/root/.local/bin:${PATH}"
 
+# uv: default to CUDA 12.8 PyTorch wheels (for uv pip interface)
+ENV UV_TORCH_BACKEND=cu128
+
 # Shell config: starship + zoxide
 RUN echo 'eval "$(starship init bash)"' >> /root/.bashrc && \
     echo 'eval "$(zoxide init bash)"' >> /root/.bashrc
