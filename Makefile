@@ -1,4 +1,4 @@
-OWNER         = $(shell gh api user -q .login)
+OWNER         = $(shell gh api user -q .login | tr 'A-Z' 'a-z')
 REPO          = $(shell basename $(shell git rev-parse --show-toplevel))
 IMAGE         = ghcr.io/$(OWNER)/$(REPO)
 CUDA_VERSION  = 12.8.1

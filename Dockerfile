@@ -3,6 +3,11 @@ FROM runpod/base:1.0.3-cuda1281-ubuntu2404
 ARG CUDA_VERSION
 LABEL cuda.version="${CUDA_VERSION}"
 
+ARG STARSHIP_VERSION=1.24.2
+ARG ZOXIDE_VERSION=0.9.9
+ARG DUST_VERSION=1.2.4
+ARG JUST_VERSION=1.49.0
+
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # gh CLI
@@ -17,14 +22,16 @@ RUN mkdir -p -m 755 /etc/apt/keyrings && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # starship (prompt)
-RUN curl -sS https://starship.rs/install.sh | sh -s -- --yes
+RUN curl -sSfL "https://github.com/starship/starship/releases/download/v${STARSHIP_VERSION}/starship-x86_64-unknown-linux-gnu.tar.gz" \
+      | tar xz -C /usr/local/bin/
 
-# zoxide (cd alternative) + dust (du alternative)
-RUN curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash && \
-    cp /root/.local/bin/zoxide /usr/local/bin/ && \
-    DUST_VERSION=$(curl -sI https://github.com/bootandy/dust/releases/latest | grep -i location | sed 's/.*tag\/v//' | tr -d '\r\n') && \
+# zoxide (cd alternative) + dust (du alternative) + just (command runner)
+RUN curl -sSfL "https://github.com/ajeetdsouza/zoxide/releases/download/v${ZOXIDE_VERSION}/zoxide-${ZOXIDE_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
+      | tar xz -C /usr/local/bin/ && \
     wget -qO /tmp/dust.deb "https://github.com/bootandy/dust/releases/download/v${DUST_VERSION}/du-dust_${DUST_VERSION}-1_amd64.deb" && \
-    dpkg -i /tmp/dust.deb && rm /tmp/dust.deb
+    dpkg -i /tmp/dust.deb && rm /tmp/dust.deb && \
+    curl -sSfL "https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
+      | tar xz -C /usr/local/bin/ just
 
 # Starship config
 COPY config/starship.toml /root/.config/starship.toml
