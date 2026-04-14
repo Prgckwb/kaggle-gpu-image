@@ -1,4 +1,7 @@
-FROM runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404
+ARG CUDA_VERSION=12.8.1
+FROM runpod/base:1.0.3-cuda1281-ubuntu2404
+ARG CUDA_VERSION
+LABEL cuda.version="${CUDA_VERSION}"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 

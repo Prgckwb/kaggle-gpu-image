@@ -2,6 +2,9 @@
 
 Kaggle コンペ用の RunPod カスタム Docker イメージ。
 
+ベースイメージに `runpod/base`（CUDA + cuDNN + RunPod インフラ）を使用。
+PyTorch は含まず、各プロジェクトで `uv sync` により管理する。
+
 ## 含まれるツール (ベースイメージに追加)
 
 | ツール | 用途 |
@@ -10,8 +13,9 @@ Kaggle コンペ用の RunPod カスタム Docker イメージ。
 | starship | プロンプト |
 | zoxide | cd 代替 (`z`) |
 | dust | du 代替 |
+| Claude Code | AI アシスタント |
 
-ベースイメージ (`runpod/pytorch`) に元から入っているもの: vim, tmux, build-essential, uv, JupyterLab, SSH 等
+ベースイメージ (`runpod/base`) に元から入っているもの: vim, tmux, build-essential, uv, Python 3.9-3.13, JupyterLab, SSH, CUDA toolkit, cuDNN 等
 
 ## ビルド & プッシュ
 
@@ -38,8 +42,8 @@ RunPod Console > Templates > New Template:
 
 | 項目 | 値 |
 |------|-----|
-| Template Name | `KaggleGPU` |
-| Container Image | `ghcr.io/prgckwb/kaggle-gpu-image:latest` |
+| Template Name | `KaggleGPU-cu12.8.1` |
+| Container Image | `ghcr.io/prgckwb/kaggle-gpu-image:cu12.8.1` |
 | Container Disk | 20 GB |
 | Volume Disk | 50-100 GB |
 | Volume Mount Path | `/workspace` |
@@ -63,7 +67,7 @@ Settings > Developer settings > Personal access tokens > Fine-grained tokens > G
 
 ## 使い方
 
-1. RunPod で `KaggleGPU` テンプレートから Pod を起動
+1. RunPod で `KaggleGPU-cu12.8.1` テンプレートから Pod を起動
 2. SSH or JupyterLab に接続
 3. リポジトリをクローン:
    ```bash
