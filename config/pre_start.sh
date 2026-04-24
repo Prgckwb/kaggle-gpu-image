@@ -20,4 +20,19 @@ fi
 [[ -n "${GIT_USER_NAME:-}" ]]  && git config --global user.name  "$GIT_USER_NAME"
 [[ -n "${GIT_USER_EMAIL:-}" ]] && git config --global user.email "$GIT_USER_EMAIL"
 
+# Claude Code: self-update on every pod start.
+# Baked version is frozen by Docker layer cache; `claude update` keeps up
+# with Anthropic's multi-release-per-week cadence. Non-fatal on network
+# failure so offline pods still start.
+if command -v claude >/dev/null 2>&1; then
+    echo "Updating Claude Code..."
+    before="$(claude -V 2>/dev/null || echo unknown)"
+    if claude update >/dev/null 2>&1; then
+        after="$(claude -V 2>/dev/null || echo unknown)"
+        echo "Claude Code: $before -> $after"
+    else
+        echo "warning: claude update failed (continuing with $before)" >&2
+    fi
+fi
+
 echo "=== pre_start.sh complete ==="

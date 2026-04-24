@@ -38,7 +38,9 @@ RUN curl -sSfL "https://github.com/ajeetdsouza/zoxide/releases/download/v${ZOXID
 # Starship config
 COPY config/starship.toml /root/.config/starship.toml
 
-# Claude Code
+# Claude Code (Tier 3: freshness comes from `claude update` in pre_start.sh,
+# not from the Docker layer — Anthropic ships multiple releases per week and
+# this layer is usually cached across CI runs).
 RUN curl -fsSL https://claude.ai/install.sh | bash
 ENV PATH="/root/.local/bin:${PATH}"
 
