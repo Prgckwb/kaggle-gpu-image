@@ -1,6 +1,8 @@
 ARG CUDA_VERSION=12.8.1
+ARG CUDA_TAG=cu128
 FROM runpod/base:1.0.3-cuda1281-ubuntu2404@sha256:cb86e4739bc7e69d117145894e90204c7615d4e1f39eafd7aa92545b857abe10
 ARG CUDA_VERSION
+ARG CUDA_TAG
 LABEL cuda.version="${CUDA_VERSION}"
 
 ARG STARSHIP_VERSION=1.24.2
@@ -40,8 +42,8 @@ COPY config/starship.toml /root/.config/starship.toml
 RUN curl -fsSL https://claude.ai/install.sh | bash
 ENV PATH="/root/.local/bin:${PATH}"
 
-# uv: default to CUDA 12.8 PyTorch wheels (for uv pip interface)
-ENV UV_TORCH_BACKEND=cu128
+# uv: default to matching CUDA PyTorch wheels (for uv pip interface)
+ENV UV_TORCH_BACKEND=${CUDA_TAG}
 
 # Shell config: starship + zoxide
 RUN echo 'eval "$(starship init bash)"' >> /root/.bashrc && \

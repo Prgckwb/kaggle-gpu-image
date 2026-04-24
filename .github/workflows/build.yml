@@ -7,9 +7,6 @@ on:
     - cron: '0 0 * * 1'  # Every Monday 00:00 UTC (09:00 JST)
   workflow_dispatch:
 
-env:
-  CUDA_VERSION: "12.8.1"
-
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -28,6 +25,21 @@ jobs:
       security-events: write
     steps:
       - uses: actions/checkout@v6
+
+      # versions.env is the single source of truth for CUDA_VERSION / CUDA_TAG /
+      # CUDA_BASE_TAG. Load it into GITHUB_ENV so later steps can use ${{ env.* }}.
+      - name: Load versions.env into env
+        run: grep -E '^[A-Z_]+=' versions.env >> "$GITHUB_ENV"
+
+      # Catch drift between versions.env and the literal FROM tag in Dockerfile
+      # (FROM stays literal so Dependabot's docker ecosystem can pin its digest).
+      - name: Verify Dockerfile FROM matches CUDA_BASE_TAG
+        run: |
+          if ! grep -qE "^FROM runpod/base:[^ ]*${CUDA_BASE_TAG}-ubuntu" Dockerfile; then
+            echo "ERROR: Dockerfile FROM line does not contain '${CUDA_BASE_TAG}-ubuntu'"
+            grep '^FROM' Dockerfile
+            exit 1
+          fi
 
       - name: Set image name
         id: image
@@ -57,6 +69,9 @@ jobs:
         with:
           context: .
           platforms: linux/amd64
+          build-args: |
+            CUDA_VERSION=${{ env.CUDA_VERSION }}
+            CUDA_TAG=${{ env.CUDA_TAG }}
           load: true
           push: false
           tags: ${{ steps.meta.outputs.tags }}
@@ -64,17 +79,29 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Release gate: fail the job on fixable HIGH/CRITICAL vulnerabilities
-      # so the image never reaches GHCR.
-      - name: Scan image for vulnerabilities
+      # Report HIGH+CRITICAL findings to the Security tab (SARIF upload below)
+      # without blocking the job. Keeps visibility into fixable HIGH CVEs that
+      # originate upstream (e.g. Go stdlib in gh) without freezing CI on them.
+      - name: Scan image for vulnerabilities (report)
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ steps.image.outputs.name }}:latest
           format: sarif
           output: trivy-results.sarif
           severity: 'CRITICAL,HIGH'
-          exit-code: '1'
           ignore-unfixed: true
+          exit-code: '0'
+
+      # Release gate: fail the job only on fixable CRITICAL vulnerabilities so
+      # upstream base-image HIGH churn does not block every push.
+      - name: Scan image for vulnerabilities (gate)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ steps.image.outputs.name }}:latest
+          severity: 'CRITICAL'
+          ignore-unfixed: true
+          exit-code: '1'
+          skip-setup-trivy: true
 
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v4
