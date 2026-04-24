@@ -1,5 +1,5 @@
 ARG CUDA_VERSION=12.8.1
-FROM runpod/base:1.0.3-cuda1281-ubuntu2404
+FROM runpod/base:1.0.3-cuda1281-ubuntu2404@sha256:cb86e4739bc7e69d117145894e90204c7615d4e1f39eafd7aa92545b857abe10
 ARG CUDA_VERSION
 LABEL cuda.version="${CUDA_VERSION}"
 

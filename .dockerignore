@@ -2,4 +2,13 @@
 README.md
 Makefile
 *.md
+
+# Secrets / local-only configs (defense in depth for remote builders)
 .env
+.env.*
+.claude/
+.ssh/
+*.pem
+*.key
+id_rsa*
+secrets/
