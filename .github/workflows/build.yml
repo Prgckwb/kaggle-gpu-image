@@ -79,10 +79,15 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Report HIGH+CRITICAL findings to the Security tab (SARIF upload below)
-      # without blocking the job. Keeps visibility into fixable HIGH CVEs that
-      # originate upstream (e.g. Go stdlib in gh) without freezing CI on them.
-      - name: Scan image for vulnerabilities (report)
+      # Informational scan — no release gate.
+      # Findings (HIGH+CRITICAL, fixable) are uploaded to the Security tab via
+      # SARIF so maintainers get a dashboard and notifications, but the job
+      # does not block on them. Practical reason: most findings originate in
+      # upstream base-image Go binaries (`gh`, docker, crictl, etc.) whose
+      # stdlib CVEs we cannot fix directly — a gate would freeze every push
+      # on upstream churn we don't control. Freshness comes instead from the
+      # weekly scheduled rebuild plus the base image digest pin.
+      - name: Scan image for vulnerabilities
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ steps.image.outputs.name }}:latest
@@ -91,17 +96,6 @@ jobs:
           severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
           exit-code: '0'
-
-      # Release gate: fail the job only on fixable CRITICAL vulnerabilities so
-      # upstream base-image HIGH churn does not block every push.
-      - name: Scan image for vulnerabilities (gate)
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          image-ref: ${{ steps.image.outputs.name }}:latest
-          severity: 'CRITICAL'
-          ignore-unfixed: true
-          exit-code: '1'
-          skip-setup-trivy: true
 
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v4
