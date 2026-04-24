@@ -37,25 +37,40 @@ make all
 初回プッシュ後、GitHub Web UI でパッケージを Public に変更:
 Settings > Packages > kaggle-gpu-image > Change visibility > Public
 
+## イメージタグ
+
+CI は以下のタグを毎ビルドで publish する。**本番運用は immutable タグを推奨**。
+
+| タグ | 例 | mutable / immutable | 用途 |
+|------|------|---------------------|------|
+| `latest` | `:latest` | mutable | 最新検証 |
+| `cu<CUDA_VERSION>` | `:cu12.8.1` | mutable | CUDA バージョン別最新 |
+| `cu<CUDA_VERSION>-<short-sha>` | `:cu12.8.1-9bdc1f8` | **immutable** | **本番 / RunPod テンプレート推奨** |
+| `sha-<short-sha>` | `:sha-9bdc1f8` | **immutable** | デバッグ / ロールバック用 |
+
+`latest` / `cu12.8.1` は毎ビルドで上書きされる点に注意。RunPod テンプレートは同じテンプレート名でも中身が変わるので、再現性が必要な運用では immutable タグ（例 `cu12.8.1-9bdc1f8`）を指定する。
+
 ## RunPod テンプレート設定
 
 RunPod Console > Templates > New Template:
 
 | 項目 | 値 |
 |------|-----|
-| Template Name | `KaggleGPU-cu12.8.1` |
-| Container Image | `ghcr.io/<username>/kaggle-gpu-image:cu12.8.1` (例: `ghcr.io/prgckwb/kaggle-gpu-image:cu12.8.1`) |
+| Template Name | `KaggleGPU-cu12.8.1-<sha>`（immutable タグに合わせる） |
+| Container Image | `ghcr.io/<username>/kaggle-gpu-image:cu12.8.1-<short-sha>` (例: `ghcr.io/prgckwb/kaggle-gpu-image:cu12.8.1-9bdc1f8`) |
 | Container Disk | 20 GB |
 | Volume Disk | 50-100 GB |
 | Volume Mount Path | `/workspace` |
 | HTTP Ports | `8888` |
 | TCP Ports | `22` |
 
+> 検証用に毎回最新を引きたい場合は `ghcr.io/<username>/kaggle-gpu-image:cu12.8.1` も可。ただし同じ template 名で実体が変わるので注意。
+
 ### 環境変数
 
 | 変数名 | 値 | Secret |
 |--------|-----|--------|
-| `GITHUB_TOKEN` | GitHub Fine-grained PAT | Yes |
+| `GITHUB_TOKEN` or `GH_TOKEN` | GitHub Fine-grained PAT (どちらでも可) | Yes |
 | `JUPYTER_PASSWORD` | 任意のパスワード | Yes |
 | `GIT_USER_NAME` | GitHub ユーザー名 | No |
 | `GIT_USER_EMAIL` | メールアドレス | No |
