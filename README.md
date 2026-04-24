@@ -72,6 +72,8 @@ RunPod Console > Templates > New Template:
 |--------|-----|--------|
 | `GITHUB_TOKEN` or `GH_TOKEN` | GitHub Fine-grained PAT (どちらでも可) | Yes |
 | `JUPYTER_PASSWORD` | 任意のパスワード | Yes |
+| `CLAUDE_CODE_OAUTH_TOKEN` | Claude Code 長期 OAuth トークン (Pro/Max サブスク用、任意) | Yes |
+| `ANTHROPIC_API_KEY` | Anthropic API キー (API 課金用、任意) | Yes |
 | `GIT_USER_NAME` | GitHub ユーザー名 | No |
 | `GIT_USER_EMAIL` | メールアドレス | No |
 
@@ -80,6 +82,15 @@ Settings > Developer settings > Personal access tokens > Fine-grained tokens > G
 
 - **Repository access**: Only select repositories → 対象リポジトリを選択
 - **Permissions > Contents**: Read and write
+
+#### Claude Code 認証 (任意)
+
+Pod 起動時に Claude Code の手動ログインを省きたい場合は、以下いずれかを RunPod Secret として登録する。どちらも未設定なら `claude /login` を pod 内で実行する形になる。
+
+- **`CLAUDE_CODE_OAUTH_TOKEN`** (Pro/Max サブスク): ローカルで `claude setup-token` を実行して発行される長期トークンを登録
+- **`ANTHROPIC_API_KEY`** (API 課金): [console.anthropic.com](https://console.anthropic.com) で発行した API キーを登録
+
+両方設定した場合は OAuth トークンが優先される。Claude Code がこれらを起動時に自動で読み込むため、`pre_start.sh` では検出ログを出すだけで追加のログイン処理は不要。
 
 ## 使い方
 

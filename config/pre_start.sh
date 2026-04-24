@@ -20,6 +20,17 @@ fi
 [[ -n "${GIT_USER_NAME:-}" ]]  && git config --global user.name  "$GIT_USER_NAME"
 [[ -n "${GIT_USER_EMAIL:-}" ]] && git config --global user.email "$GIT_USER_EMAIL"
 
+# Claude Code auth: prefer CLAUDE_CODE_OAUTH_TOKEN (Pro/Max), fallback to
+# ANTHROPIC_API_KEY (API billing). Claude Code reads these env vars at
+# startup; we only surface the state so pod logs show which mode is active.
+if [[ -n "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]]; then
+    echo "Claude Code: OAuth token detected (Pro/Max subscription)."
+elif [[ -n "${ANTHROPIC_API_KEY:-}" ]]; then
+    echo "Claude Code: API key detected."
+else
+    echo "Claude Code: no token found. Run 'claude /login' manually inside the pod."
+fi
+
 # Claude Code: self-update on every pod start.
 # Baked version is frozen by Docker layer cache; `claude update` keeps up
 # with Anthropic's multi-release-per-week cadence. Non-fatal on network
