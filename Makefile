@@ -1,7 +1,8 @@
+include versions.env
+
 # Override IMAGE to avoid gh/network dependency:
 #   make build IMAGE=ghcr.io/myorg/myrepo
 IMAGE        ?= ghcr.io/$(shell gh api user -q .login 2>/dev/null | tr 'A-Z' 'a-z')/$(shell basename $(shell git rev-parse --show-toplevel) 2>/dev/null)
-CUDA_VERSION  = 12.8.1
 VERSION_TAG   = cu$(CUDA_VERSION)
 
 .PHONY: check-image build push login all
@@ -16,6 +17,8 @@ check-image:
 
 build: check-image
 	docker build --platform linux/amd64 \
+		--build-arg CUDA_VERSION=$(CUDA_VERSION) \
+		--build-arg CUDA_TAG=$(CUDA_TAG) \
 		-t $(IMAGE):latest \
 		-t $(IMAGE):$(VERSION_TAG) .
 
