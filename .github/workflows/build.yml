@@ -11,7 +11,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: Dockerfile
@@ -24,7 +24,7 @@ jobs:
       packages: write
       security-events: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       # versions.env is the single source of truth for CUDA_VERSION / CUDA_TAG /
       # CUDA_BASE_TAG. Load it into GITHUB_ENV so later steps can use ${{ env.* }}.
