@@ -16,7 +16,7 @@ PyTorch は含まず、各プロジェクトで `uv sync` により管理する�
 | just | コマンドランナー |
 | Claude Code | AI アシスタント |
 
-ベースイメージ (`runpod/base`) に元から入っているもの: vim, tmux, build-essential, uv, Python 3.9-3.13, JupyterLab, SSH, CUDA toolkit, cuDNN 等
+ベースイメージ (`runpod/base`) に元から入っているもの: vim, tmux, build-essential, uv, Python 3.10-3.13 (デフォルト 3.12), JupyterLab, SSH, CUDA toolkit, cuDNN 等
 
 ## ビルド & プッシュ
 
