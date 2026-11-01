@@ -45,10 +45,10 @@ CI は以下のタグを毎ビルドで publish する。**本番運用は immut
 |------|------|---------------------|------|
 | `latest` | `:latest` | mutable | 最新検証 |
 | `cu<CUDA_VERSION>` | `:cu12.8.1` | mutable | CUDA バージョン別最新 |
-| `cu<CUDA_VERSION>-<short-sha>` | `:cu12.8.1-9bdc1f8` | **immutable** | **本番 / RunPod テンプレート推奨** |
-| `sha-<short-sha>` | `:sha-9bdc1f8` | **immutable** | デバッグ / ロールバック用 |
+| `cu<CUDA_VERSION>-<short-sha>` | `:cu12.8.1-85d2c80` | **immutable** | **本番 / RunPod テンプレート推奨** |
+| `sha-<short-sha>` | `:sha-85d2c80` | **immutable** | デバッグ / ロールバック用 |
 
-`latest` / `cu12.8.1` は毎ビルドで上書きされる点に注意。RunPod テンプレートは同じテンプレート名でも中身が変わるので、再現性が必要な運用では immutable タグ（例 `cu12.8.1-9bdc1f8`）を指定する。
+`latest` / `cu12.8.1` は毎ビルドで上書きされる点に注意。RunPod テンプレートは同じテンプレート名でも中身が変わるので、再現性が必要な運用では immutable タグ（例 `cu12.8.1-85d2c80`）を指定する。
 
 ## RunPod テンプレート設定
 
@@ -57,7 +57,7 @@ RunPod Console > Templates > New Template:
 | 項目 | 値 |
 |------|-----|
 | Template Name | `KaggleGPU-cu12.8.1-<sha>`（immutable タグに合わせる） |
-| Container Image | `ghcr.io/<username>/kaggle-gpu-image:cu12.8.1-<short-sha>` (例: `ghcr.io/prgckwb/kaggle-gpu-image:cu12.8.1-9bdc1f8`) |
+| Container Image | `ghcr.io/<username>/kaggle-gpu-image:cu12.8.1-<short-sha>` (例: `ghcr.io/prgckwb/kaggle-gpu-image:cu12.8.1-85d2c80`) |
 | Container Disk | 20 GB |
 | Volume Disk | 50-100 GB |
 | Volume Mount Path | `/workspace` |
